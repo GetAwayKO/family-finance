@@ -1,17 +1,24 @@
 @font-face {
-  font-family: "Open Sans";
+  font-family: "PirataOne-Regular";
   src: url("../../../../public/fonts/PirataOne-Regular.ttf");
 }
 header {
+  top: 0;
+  position: sticky;
+  background-color: rgb(205, 230, 185);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0.5rem;
+  padding: 0.5rem;
+  .menu-btn {
+    width: 50px;
+  }
   .title {
     display: flex;
     align-items: center;
     width: 50%;
     h1 {
+      font-family: "PirataOne-Regular";
       font-size: 24px;
     }
   }
