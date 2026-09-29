@@ -101,8 +101,9 @@ export default function AccountsPage() {
     >
       {accounts.data && visible.length === 0 ? (
         <Alert severity="info">
-          Счетов пока нет. Добавьте карту, наличные или вклад — остаток будет
-          считаться по операциям.
+          {accounts.data.length > 0
+            ? "Все счета в архиве. Включите «Показать архив», чтобы их увидеть."
+            : "Счетов пока нет. Добавьте карту, наличные или вклад — остаток будет считаться по операциям."}
         </Alert>
       ) : (
         <TableContainer component={Paper}>

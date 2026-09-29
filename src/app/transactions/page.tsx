@@ -7,10 +7,11 @@ import {
   type GridPaginationModel,
 } from "@mui/x-data-grid";
 import { ruRU } from "@mui/x-data-grid/locales";
-import { useDeferredValue, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Page from "@/components/layout/Page";
 import { api } from "@/shared/api/client";
 import { useApi } from "@/shared/api/request";
+import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { categoryLabel } from "@/shared/finance/categories";
 import { formatDate, monthRange } from "@/shared/finance/dates";
 import { useAccounts, useCategories } from "@/shared/finance/hooks";
@@ -42,8 +43,14 @@ export default function TransactionsPage() {
   });
   const [editing, setEditing] = useState<Transaction | "new" | null>(null);
 
-  // Поиск не дёргает сервер на каждую букву.
-  const search = useDeferredValue(filters.search.trim());
+  // Поиск уходит на сервер, когда пользователь перестал печатать.
+  const search = useDebouncedValue(filters.search.trim());
+  const [searchedFor, setSearchedFor] = useState(search);
+  if (searchedFor !== search) {
+    // Новый поиск — с первой страницы (сброс прямо в рендере, без лишнего запроса).
+    setSearchedFor(search);
+    setPagination((p) => ({ ...p, page: 0 }));
+  }
   const query = {
     from: filters.from || undefined,
     to: filters.to || undefined,
@@ -132,7 +139,10 @@ export default function TransactionsPage() {
         value={filters}
         onChange={(next) => {
           setFilters(next);
-          setPagination((p) => ({ ...p, page: 0 }));
+          // Страницу по поиску сбрасываем вместе с запросом, а не на каждую букву.
+          if (next.search === filters.search) {
+            setPagination((p) => ({ ...p, page: 0 }));
+          }
         }}
         accounts={accounts.data ?? []}
         categories={categories.data ?? []}

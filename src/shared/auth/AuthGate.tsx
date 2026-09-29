@@ -6,11 +6,20 @@ import { useAuth } from "./AuthProvider";
 
 export const PUBLIC_PATHS = ["/login", "/register"];
 
-/** Куда вернуться после входа. Только внутренние пути, без `//evil.com`. */
+/**
+ * Куда вернуться после входа. Только внутренние пути: `//evil.com` и `/\evil.com`
+ * браузер понимает как адрес чужого сайта, поэтому сверяем origin после разбора.
+ */
 export function safeNextPath(next: string | null): string {
-  return next && next.startsWith("/") && !next.startsWith("//")
-    ? next
-    : "/home";
+  if (!next || !next.startsWith("/")) return "/home";
+  const base = "http://localhost";
+  try {
+    const url = new URL(next, base);
+    if (url.origin !== base) return "/home";
+    return url.pathname + url.search + url.hash;
+  } catch {
+    return "/home";
+  }
 }
 
 /**

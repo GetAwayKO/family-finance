@@ -67,14 +67,19 @@ export default function TransactionFilters({
         label="Тип"
         size="small"
         value={value.type}
-        onChange={(e) =>
+        onChange={(e) => {
+          const type = e.target.value as Filters["type"];
+          const category = categories.find((c) => c.id === value.categoryId);
+          // Категория доходов не подходит к фильтру по расходам и наоборот,
+          // а у перевода категории нет вовсе.
+          const keepCategory =
+            !!category && (type === "" || type === category.kind);
           onChange({
             ...value,
-            type: e.target.value as Filters["type"],
-            // Категории доходов не подходят к фильтру по расходам и наоборот.
-            categoryId: e.target.value === "transfer" ? "" : value.categoryId,
-          })
-        }
+            type,
+            categoryId: keepCategory ? value.categoryId : "",
+          });
+        }}
       >
         <MenuItem value="">Все</MenuItem>
         {Object.entries(TRANSACTION_TYPE_LABELS).map(([type, label]) => (

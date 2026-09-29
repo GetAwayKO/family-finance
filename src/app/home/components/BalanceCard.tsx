@@ -48,7 +48,10 @@ export default function BalanceCard({ accounts }: { accounts: Account[] }) {
       <Divider sx={{ my: 2 }} />
       {report.data && rows.length === 0 && (
         <Typography color="text.secondary">
-          Счетов пока нет. <Link href="/accounts">Добавить счёт</Link>
+          {accounts.length > 0 ? "Все счета в архиве. " : "Счетов пока нет. "}
+          <Link href="/accounts">
+            {accounts.length > 0 ? "Перейти к счетам" : "Добавить счёт"}
+          </Link>
         </Typography>
       )}
       <List dense disablePadding>
