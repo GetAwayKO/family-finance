@@ -16,6 +16,12 @@ export type FamilyMember = Schemas["FamilyMemberDto"];
 export type FamilyRole = Schemas["FamilyRole"];
 export type Invite = Schemas["InviteDto"];
 export type IncomingInvite = Schemas["IncomingInviteDto"];
+export type BudgetMonth = Schemas["BudgetMonthDto"];
+export type BudgetItem = Schemas["BudgetItemDto"];
+export type RecurringPayment = Schemas["RecurringPaymentDto"];
+export type SaveRecurringPayment = Schemas["SaveRecurringPaymentDto"];
+export type RecurrenceFrequency = Schemas["RecurrenceFrequency"];
+export type Goal = Schemas["GoalDto"];
 /** Код валюты, которую принимает сервер. */
 export type CurrencyCode = Schemas["CreateAccountDto"]["currency"];
 

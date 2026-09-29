@@ -1,7 +1,5 @@
 "use client";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Alert, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Alert, Paper, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import {
   Bar,
@@ -12,9 +10,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import MonthSwitcher from "@/components/MonthSwitcher";
 import { api } from "@/shared/api/client";
 import { useApi } from "@/shared/api/request";
-import { formatMonth, monthRange } from "@/shared/finance/dates";
+import { monthRange } from "@/shared/finance/dates";
 import { formatMoney } from "@/shared/finance/money";
 import { AXIS_TEXT, compact, GRID, SERIES, toUnits } from "./charts";
 
@@ -59,24 +58,11 @@ export default function ExpensesByCategory({ version }: { version: unknown }) {
         <Typography variant="h6" component="h3" sx={{ mb: 0 }}>
           Расходы по категориям
         </Typography>
-        <Stack direction="row" sx={{ alignItems: "center" }}>
-          <IconButton
-            aria-label="Предыдущий месяц"
-            onClick={() => setOffset((o) => o - 1)}
-          >
-            <ChevronLeftIcon />
-          </IconButton>
-          <Typography sx={{ minWidth: 100, textAlign: "center" }}>
-            {formatMonth(period.from.slice(0, 7))}
-          </Typography>
-          <IconButton
-            aria-label="Следующий месяц"
-            onClick={() => setOffset((o) => o + 1)}
-            disabled={offset >= 0}
-          >
-            <ChevronRightIcon />
-          </IconButton>
-        </Stack>
+        <MonthSwitcher
+          month={period.from.slice(0, 7)}
+          offset={offset}
+          onChange={setOffset}
+        />
       </Stack>
       {data && (
         <Typography color="text.secondary" sx={{ mb: 2 }}>

@@ -6,9 +6,11 @@ import Page from "@/components/layout/Page";
 import { useAccounts, useCategories, useFamily } from "@/shared/finance/hooks";
 import TransactionDialog from "../transactions/components/TransactionDialog";
 import BalanceCard from "./components/BalanceCard";
+import BudgetCard from "./components/BudgetCard";
 import ExpensesByCategory from "./components/ExpensesByCategory";
 import MembersCard from "./components/MembersCard";
 import MonthlyChart from "./components/MonthlyChart";
+import UpcomingPayments from "./components/UpcomingPayments";
 
 export default function HomePage() {
   const accounts = useAccounts();
@@ -44,6 +46,26 @@ export default function HomePage() {
       >
         {accounts.data && <BalanceCard accounts={accounts.data} />}
         <ExpensesByCategory version={version} />
+      </Box>
+      <Box
+        sx={{
+          display: "grid",
+          gap: 3,
+          gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+          alignItems: "start",
+        }}
+      >
+        {accounts.data && (
+          <UpcomingPayments
+            accounts={accounts.data}
+            version={version}
+            onPaid={() => {
+              setVersion((v) => v + 1);
+              accounts.reload();
+            }}
+          />
+        )}
+        <BudgetCard version={version} />
       </Box>
       <MonthlyChart version={version} />
       {family.data && family.data.members.length > 1 && (

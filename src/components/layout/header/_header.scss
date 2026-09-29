@@ -25,7 +25,9 @@ header {
   }
   .menu {
     display: flex;
-    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    column-gap: 1.25rem;
     padding-right: 1rem;
     &__link {
       padding: 0.25rem 0;

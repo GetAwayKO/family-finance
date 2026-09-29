@@ -468,6 +468,150 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/budgets/{month}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BudgetsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/budgets/{month}/{categoryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["BudgetsController_set"];
+        post?: never;
+        delete: operations["BudgetsController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/budgets/{month}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["BudgetsController_copy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recurring-payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RecurringController_list"];
+        put?: never;
+        post: operations["RecurringController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recurring-payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["RecurringController_replace"];
+        post?: never;
+        delete: operations["RecurringController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recurring-payments/{id}/pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RecurringController_pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recurring-payments/{id}/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RecurringController_skip"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GoalsController_list"];
+        put?: never;
+        post: operations["GoalsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["GoalsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["GoalsController_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -970,6 +1114,309 @@ export interface components {
             missingRates: string[];
             /** @description Доходы и расходы по авторам операций, по убыванию расходов */
             items: components["schemas"]["MemberAmountDto"][];
+        };
+        BudgetItemDto: {
+            /** Format: uuid */
+            categoryId: string;
+            name: string;
+            /**
+             * @description Лимит в основной валюте; null — лимита нет
+             * @example 150000
+             */
+            limit: string | null;
+            /**
+             * @description Потрачено в основной валюте, с подкатегориями. Расходы по скрытым счетам других участников сюда не входят
+             * @example 150000
+             */
+            spent: string;
+        };
+        BudgetMonthDto: {
+            /** @example 2026-09 */
+            month: string;
+            /**
+             * @description Основная валюта семьи
+             * @example RUB
+             */
+            currency: string;
+            /** @description Категории с лимитом, затем категории без лимита, но с расходами */
+            items: components["schemas"]["BudgetItemDto"][];
+            /**
+             * @description Сумма лимитов
+             * @example 150000
+             */
+            totalLimit: string;
+            /**
+             * @description Потрачено в категориях с лимитом
+             * @example 150000
+             */
+            totalSpent: string;
+            /**
+             * @description Потрачено в категориях без лимита
+             * @example 150000
+             */
+            otherSpent: string;
+            /**
+             * @description Расходы по скрытым счетам других участников («Личные (скрыто)»)
+             * @example 150000
+             */
+            hiddenSpent: string;
+            /** @description Валюты, для которых нет ни одного курса */
+            missingRates: string[];
+        };
+        SetBudgetDto: {
+            /**
+             * @description Лимит в основной валюте семьи, > 0
+             * @example 150000
+             */
+            amount: string;
+        };
+        CopyBudgetsDto: {
+            /**
+             * @description Месяц, из которого копируются лимиты
+             * @example 2026-09
+             */
+            from: string;
+        };
+        /** @enum {string} */
+        RecurrenceFrequency: "weekly" | "monthly" | "yearly";
+        RecurringPaymentDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Аренда квартиры */
+            name: string;
+            type: components["schemas"]["TransactionType"];
+            /** Format: uuid */
+            accountId: string;
+            /**
+             * @description Сумма в валюте счёта accountId. null — перевод со счёта, детализацию которого владелец скрыл
+             * @example 150000
+             */
+            amount: string | null;
+            /** Format: uuid */
+            categoryId: string | null;
+            /** Format: uuid */
+            toAccountId: string | null;
+            /** @example 150000 */
+            toAmount: string | null;
+            comment: string;
+            frequency: components["schemas"]["RecurrenceFrequency"];
+            /** @description Каждые interval недель, месяцев или лет */
+            interval: number;
+            /**
+             * Format: date
+             * @description Ближайший непроведённый платёж; null — расписание закончилось
+             */
+            nextDate: string | null;
+            /** Format: date */
+            endDate: string | null;
+            /** @description За сколько дней до платежа напоминать */
+            remindDaysBefore: number;
+            /** Format: uuid */
+            authorId: string;
+            authorName: string;
+            /** @description Текущий пользователь может изменить платёж */
+            canEdit: boolean;
+            /** @description Текущий пользователь может провести или пропустить платёж */
+            canPay: boolean;
+        };
+        CreateRecurringPaymentDto: {
+            name: string;
+            type: components["schemas"]["TransactionType"];
+            /** Format: uuid */
+            accountId: string;
+            /**
+             * @description Сумма в валюте счёта accountId, > 0
+             * @example 150000
+             */
+            amount: string;
+            /** Format: uuid */
+            categoryId?: string | null;
+            /** Format: uuid */
+            toAccountId?: string | null;
+            /** @example 150000 */
+            toAmount?: string | null;
+            comment?: string;
+            frequency: components["schemas"]["RecurrenceFrequency"];
+            /** @default 1 */
+            interval: number;
+            /**
+             * Format: date
+             * @description Дата следующего платежа; от неё отсчитываются последующие повторения
+             * @example 2026-09-29
+             */
+            nextDate: string;
+            /**
+             * Format: date
+             * @description Последний день расписания; null — без конца
+             */
+            endDate?: string | null;
+            /** @default 3 */
+            remindDaysBefore: number;
+            /**
+             * Format: uuid
+             * @description Создаётся клиентом
+             */
+            id: string;
+        };
+        SaveRecurringPaymentDto: {
+            name: string;
+            type: components["schemas"]["TransactionType"];
+            /** Format: uuid */
+            accountId: string;
+            /**
+             * @description Сумма в валюте счёта accountId, > 0
+             * @example 150000
+             */
+            amount: string;
+            /** Format: uuid */
+            categoryId?: string | null;
+            /** Format: uuid */
+            toAccountId?: string | null;
+            /** @example 150000 */
+            toAmount?: string | null;
+            comment?: string;
+            frequency: components["schemas"]["RecurrenceFrequency"];
+            /** @default 1 */
+            interval: number;
+            /**
+             * Format: date
+             * @description Дата следующего платежа; от неё отсчитываются последующие повторения
+             * @example 2026-09-29
+             */
+            nextDate: string;
+            /**
+             * Format: date
+             * @description Последний день расписания; null — без конца
+             */
+            endDate?: string | null;
+            /** @default 3 */
+            remindDaysBefore: number;
+        };
+        PayRecurringPaymentDto: {
+            /**
+             * Format: date
+             * @description Текущая nextDate платежа. Если платёж уже сдвинулся (проведён с другого устройства), ответ 409
+             * @example 2026-09-29
+             */
+            occurrence: string;
+            /**
+             * Format: uuid
+             * @description id создаваемой операции (от клиента): повторная отправка не проводит платёж дважды
+             */
+            transactionId: string;
+            /**
+             * Format: date
+             * @description Дата операции, по умолчанию occurrence
+             * @example 2026-09-29
+             */
+            date?: string;
+            /**
+             * @description Сумма, если отличается от обычной
+             * @example 150000
+             */
+            amount?: string;
+            /**
+             * @description Перевод в другую валюту: сумма зачисления
+             * @example 150000
+             */
+            toAmount?: string;
+        };
+        PaidRecurringPaymentDto: {
+            payment: components["schemas"]["RecurringPaymentDto"];
+            transaction: components["schemas"]["TransactionDto"];
+        };
+        SkipRecurringPaymentDto: {
+            /**
+             * Format: date
+             * @description Текущая nextDate платежа. Если платёж уже сдвинулся (проведён с другого устройства), ответ 409
+             * @example 2026-09-29
+             */
+            occurrence: string;
+        };
+        GoalDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Отпуск */
+            name: string;
+            /**
+             * @description Валюта цели
+             * @example RUB
+             */
+            currency: string;
+            /**
+             * @description Сколько нужно накопить, в валюте цели
+             * @example 150000
+             */
+            targetAmount: string;
+            /**
+             * @description Накоплено в валюте цели: остаток счёта accountId по текущему курсу, а без счёта — savedAmount. null — нет курса валюты счёта
+             * @example 150000
+             */
+            saved: string | null;
+            /**
+             * @description Накоплено вручную (для цели без счёта)
+             * @example 150000
+             */
+            savedAmount: string;
+            /**
+             * Format: uuid
+             * @description Счёт, остаток которого считается накопленным
+             */
+            accountId: string | null;
+            /** Format: date */
+            targetDate: string | null;
+            archived: boolean;
+            /** Format: uuid */
+            authorId: string;
+            authorName: string;
+            /** @description Текущий пользователь может изменить цель: автор или владелец семьи */
+            canEdit: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateGoalDto: {
+            /**
+             * Format: uuid
+             * @description Создаётся клиентом
+             */
+            id: string;
+            name: string;
+            /**
+             * @example RUB
+             * @enum {string}
+             */
+            currency: "RUB" | "USD" | "EUR" | "CNY" | "GBP" | "JPY" | "KZT" | "BYN" | "TRY" | "AMD" | "GEL" | "AED";
+            /**
+             * @description > 0
+             * @example 150000
+             */
+            targetAmount: string;
+            /**
+             * @description По умолчанию 0
+             * @example 150000
+             */
+            savedAmount?: string;
+            /** Format: uuid */
+            accountId?: string | null;
+            /** Format: date */
+            targetDate?: string | null;
+        };
+        UpdateGoalDto: {
+            name?: string;
+            /** @enum {string} */
+            currency?: "RUB" | "USD" | "EUR" | "CNY" | "GBP" | "JPY" | "KZT" | "BYN" | "TRY" | "AMD" | "GEL" | "AED";
+            /** @example 150000 */
+            targetAmount?: string;
+            /** @example 150000 */
+            savedAmount?: string;
+            /**
+             * Format: uuid
+             * @description null — отвязать счёт
+             */
+            accountId?: string | null;
+            /** Format: date */
+            targetDate?: string | null;
+            archived?: boolean;
         };
     };
     responses: never;
@@ -1744,7 +2191,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Категория используется в операциях или имеет подкатегории */
+            /** @description Категория используется в операциях или регулярных платежах либо имеет подкатегории */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -2063,6 +2510,378 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberReportDto"];
+                };
+            };
+        };
+    };
+    BudgetsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetMonthDto"];
+                };
+            };
+        };
+    };
+    BudgetsController_set: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                month: string;
+                /** @description Категория расходов верхнего уровня */
+                categoryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetBudgetDto"];
+            };
+        };
+        responses: {
+            /** @description Бюджет месяца */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetMonthDto"];
+                };
+            };
+            /** @description Категория не расходов или не верхнего уровня */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BudgetsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                month: string;
+                /** @description Категория расходов верхнего уровня */
+                categoryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Лимита больше нет (или не было) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BudgetsController_copy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyBudgetsDto"];
+            };
+        };
+        responses: {
+            /** @description Лимиты, которых в месяце ещё нет, копируются из месяца from */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetMonthDto"];
+                };
+            };
+        };
+    };
+    RecurringController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description По возрастанию nextDate, законченные — в конце */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringPaymentDto"][];
+                };
+            };
+        };
+    };
+    RecurringController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRecurringPaymentDto"];
+            };
+        };
+        responses: {
+            /** @description Повтор с тем же id возвращает уже созданный платёж */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringPaymentDto"];
+                };
+            };
+            /** @description Неверные счёт, категория или суммы */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description id занят другим пользователем */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RecurringController_replace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveRecurringPaymentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringPaymentDto"];
+                };
+            };
+            /** @description Неверные счёт, категория или суммы */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RecurringController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RecurringController_pay: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PayRecurringPaymentDto"];
+            };
+        };
+        responses: {
+            /** @description Создаёт операцию и сдвигает nextDate. Повтор с тем же transactionId возвращает тот же результат */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaidRecurringPaymentDto"];
+                };
+            };
+            /** @description Повторение уже проведено или пропущено */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RecurringController_skip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SkipRecurringPaymentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringPaymentDto"];
+                };
+            };
+            /** @description Повторение уже проведено или пропущено */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GoalsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalDto"][];
+                };
+            };
+        };
+    };
+    GoalsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGoalDto"];
+            };
+        };
+        responses: {
+            /** @description Повтор с тем же id возвращает уже созданную цель */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalDto"];
+                };
+            };
+            /** @description id занят */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GoalsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GoalsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGoalDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalDto"];
                 };
             };
         };
