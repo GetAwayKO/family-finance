@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/currencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MoneyController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/register": {
         parameters: {
             query?: never;
@@ -100,6 +116,182 @@ export interface paths {
         patch: operations["UsersController_updateMe"];
         trace?: never;
     };
+    "/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AccountsController_list"];
+        put?: never;
+        post: operations["AccountsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AccountsController_get"];
+        put?: never;
+        post?: never;
+        delete: operations["AccountsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["AccountsController_update"];
+        trace?: never;
+    };
+    "/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CategoriesController_list"];
+        put?: never;
+        post: operations["CategoriesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["CategoriesController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["CategoriesController_update"];
+        trace?: never;
+    };
+    "/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TransactionsController_list"];
+        put?: never;
+        post: operations["TransactionsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transactions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TransactionsController_get"];
+        put: operations["TransactionsController_replace"];
+        post?: never;
+        delete: operations["TransactionsController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exchange-rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ExchangeRatesController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exchange-rates/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ExchangeRatesController_convert"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReportsController_balance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReportsController_byCategory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/monthly": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReportsController_monthly"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -107,6 +299,19 @@ export interface components {
         HealthDto: {
             /** @enum {string} */
             status: "ok";
+        };
+        CurrencyDto: {
+            /** @example RUB */
+            code: string;
+            /** @example Российский рубль */
+            name: string;
+            /** @example ₽ */
+            symbol: string;
+            /**
+             * @description Знаков после запятой
+             * @example 2
+             */
+            decimals: number;
         };
         RegisterDto: {
             /**
@@ -124,6 +329,11 @@ export interface components {
             /** Format: email */
             email: string;
             name: string;
+            /**
+             * @description Валюта отчётов и общего баланса
+             * @example RUB
+             */
+            baseCurrency: string;
             /** Format: date-time */
             createdAt: string;
         };
@@ -156,7 +366,296 @@ export interface components {
             refreshToken: string;
         };
         UpdateProfileDto: {
+            name?: string;
+            /**
+             * @example RUB
+             * @enum {string}
+             */
+            baseCurrency?: "RUB" | "USD" | "EUR" | "CNY" | "GBP" | "JPY" | "KZT" | "BYN" | "TRY" | "AMD" | "GEL" | "AED";
+        };
+        /** @enum {string} */
+        AccountType: "cash" | "card" | "deposit";
+        AccountDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Карта Тинькофф */
             name: string;
+            type: components["schemas"]["AccountType"];
+            /** @example RUB */
+            currency: string;
+            /**
+             * @description Остаток на момент заведения счёта
+             * @example 150000
+             */
+            initialBalance: string;
+            /**
+             * @description Текущий остаток с учётом всех операций
+             * @example 150000
+             */
+            balance: string;
+            archived: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateAccountDto: {
+            /**
+             * Format: uuid
+             * @description Создаётся клиентом
+             */
+            id: string;
+            name: string;
+            type: components["schemas"]["AccountType"];
+            /**
+             * @example RUB
+             * @enum {string}
+             */
+            currency: "RUB" | "USD" | "EUR" | "CNY" | "GBP" | "JPY" | "KZT" | "BYN" | "TRY" | "AMD" | "GEL" | "AED";
+            /**
+             * @description По умолчанию 0
+             * @example 150000
+             */
+            initialBalance?: string;
+        };
+        UpdateAccountDto: {
+            name?: string;
+            type?: components["schemas"]["AccountType"];
+            /** @example 150000 */
+            initialBalance?: string;
+            /** @description Архивный счёт скрыт из форм */
+            archived?: boolean;
+        };
+        /** @enum {string} */
+        CategoryKind: "income" | "expense";
+        CategoryDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Продукты */
+            name: string;
+            kind: components["schemas"]["CategoryKind"];
+            /**
+             * Format: uuid
+             * @description Родительская категория; вложенность — один уровень
+             */
+            parentId: string | null;
+            archived: boolean;
+        };
+        CreateCategoryDto: {
+            /**
+             * Format: uuid
+             * @description Создаётся клиентом
+             */
+            id: string;
+            name: string;
+            kind: components["schemas"]["CategoryKind"];
+            /** Format: uuid */
+            parentId?: string | null;
+        };
+        UpdateCategoryDto: {
+            name?: string;
+            /**
+             * Format: uuid
+             * @description null — сделать категорию верхнего уровня
+             */
+            parentId?: string | null;
+            archived?: boolean;
+        };
+        /** @enum {string} */
+        TransactionType: "income" | "expense" | "transfer";
+        TransactionDto: {
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["TransactionType"];
+            /**
+             * Format: date
+             * @example 2026-09-29
+             */
+            date: string;
+            /**
+             * Format: uuid
+             * @description Счёт дохода или расхода; для перевода — счёт списания
+             */
+            accountId: string;
+            /**
+             * @description Сумма в валюте счёта accountId, > 0
+             * @example 150000
+             */
+            amount: string;
+            /** Format: uuid */
+            categoryId: string | null;
+            /**
+             * Format: uuid
+             * @description Перевод: счёт зачисления
+             */
+            toAccountId: string | null;
+            /**
+             * @description Перевод: сумма зачисления в валюте счёта toAccountId
+             * @example 150000
+             */
+            toAmount: string | null;
+            comment: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        TransactionPageDto: {
+            items: components["schemas"]["TransactionDto"][];
+            /** @description Всего операций под фильтром */
+            total: number;
+        };
+        CreateTransactionDto: {
+            type: components["schemas"]["TransactionType"];
+            /**
+             * Format: date
+             * @example 2026-09-29
+             */
+            date: string;
+            /** Format: uuid */
+            accountId: string;
+            /**
+             * @description Сумма в валюте счёта accountId, > 0
+             * @example 150000
+             */
+            amount: string;
+            /**
+             * Format: uuid
+             * @description Обязательна для дохода и расхода, у перевода её нет
+             */
+            categoryId?: string | null;
+            /**
+             * Format: uuid
+             * @description Обязателен для перевода
+             */
+            toAccountId?: string | null;
+            /**
+             * @description Перевод: сумма зачисления. Обязательна, если валюты счетов разные; при одной валюте равна amount
+             * @example 150000
+             */
+            toAmount?: string | null;
+            comment?: string;
+            /**
+             * Format: uuid
+             * @description Создаётся клиентом; повторная отправка не создаёт дубль
+             */
+            id: string;
+        };
+        SaveTransactionDto: {
+            type: components["schemas"]["TransactionType"];
+            /**
+             * Format: date
+             * @example 2026-09-29
+             */
+            date: string;
+            /** Format: uuid */
+            accountId: string;
+            /**
+             * @description Сумма в валюте счёта accountId, > 0
+             * @example 150000
+             */
+            amount: string;
+            /**
+             * Format: uuid
+             * @description Обязательна для дохода и расхода, у перевода её нет
+             */
+            categoryId?: string | null;
+            /**
+             * Format: uuid
+             * @description Обязателен для перевода
+             */
+            toAccountId?: string | null;
+            /**
+             * @description Перевод: сумма зачисления. Обязательна, если валюты счетов разные; при одной валюте равна amount
+             * @example 150000
+             */
+            toAmount?: string | null;
+            comment?: string;
+        };
+        ExchangeRateDto: {
+            /** @example USD */
+            currency: string;
+            /**
+             * @description Сколько рублей стоит 1 единица валюты
+             * @example 92.5
+             */
+            rate: string;
+        };
+        ConvertResultDto: {
+            /**
+             * @description Сумма в минимальных единицах валюты to; null — курса нет
+             * @example 150000
+             */
+            amount: string | null;
+        };
+        AccountBalanceDto: {
+            /** Format: uuid */
+            accountId: string;
+            /** @example USD */
+            currency: string;
+            /**
+             * @description В валюте счёта
+             * @example 150000
+             */
+            balance: string;
+            /**
+             * @description В основной валюте по текущему курсу; null — курса нет
+             * @example 150000
+             */
+            converted: string | null;
+        };
+        BalanceReportDto: {
+            /**
+             * @description Основная валюта пользователя
+             * @example RUB
+             */
+            currency: string;
+            /** @description Валюты, для которых нет ни одного курса: их суммы в отчёт не вошли */
+            missingRates: string[];
+            /**
+             * @description Сумма остатков в основной валюте
+             * @example 150000
+             */
+            total: string;
+            accounts: components["schemas"]["AccountBalanceDto"][];
+        };
+        CategoryAmountDto: {
+            /**
+             * Format: uuid
+             * @description Категория верхнего уровня; подкатегории включены в неё
+             */
+            categoryId: string;
+            name: string;
+            /** @example 150000 */
+            amount: string;
+        };
+        CategoryReportDto: {
+            /**
+             * @description Основная валюта пользователя
+             * @example RUB
+             */
+            currency: string;
+            /** @description Валюты, для которых нет ни одного курса: их суммы в отчёт не вошли */
+            missingRates: string[];
+            /** @example 150000 */
+            total: string;
+            /** @description По убыванию суммы */
+            items: components["schemas"]["CategoryAmountDto"][];
+        };
+        MonthAmountDto: {
+            /** @example 2026-09 */
+            month: string;
+            /** @example 150000 */
+            income: string;
+            /** @example 150000 */
+            expense: string;
+        };
+        MonthlyReportDto: {
+            /**
+             * @description Основная валюта пользователя
+             * @example RUB
+             */
+            currency: string;
+            /** @description Валюты, для которых нет ни одного курса: их суммы в отчёт не вошли */
+            missingRates: string[];
+            /** @description Все месяцы периода по порядку, включая пустые */
+            months: components["schemas"]["MonthAmountDto"][];
         };
     };
     responses: never;
@@ -182,6 +681,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthDto"];
+                };
+            };
+        };
+    };
+    MoneyController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrencyDto"][];
                 };
             };
         };
@@ -335,6 +853,488 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserDto"];
+                };
+            };
+        };
+    };
+    AccountsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDto"][];
+                };
+            };
+        };
+    };
+    AccountsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAccountDto"];
+            };
+        };
+        responses: {
+            /** @description Повтор с тем же id возвращает уже созданный счёт */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDto"];
+                };
+            };
+            /** @description id занят другим пользователем */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AccountsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDto"];
+                };
+            };
+        };
+    };
+    AccountsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description По счёту есть операции */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AccountsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAccountDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDto"];
+                };
+            };
+        };
+    };
+    CategoriesController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryDto"][];
+                };
+            };
+        };
+    };
+    CategoriesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCategoryDto"];
+            };
+        };
+        responses: {
+            /** @description Повтор с тем же id возвращает уже созданную категорию */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryDto"];
+                };
+            };
+            /** @description id занят другим пользователем */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CategoriesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Категория используется в операциях или имеет подкатегории */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CategoriesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCategoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryDto"];
+                };
+            };
+        };
+    };
+    TransactionsController_list: {
+        parameters: {
+            query?: {
+                /** @description С даты включительно */
+                from?: string;
+                /** @description По дату включительно */
+                to?: string;
+                type?: components["schemas"]["TransactionType"];
+                /** @description Операции по счёту, включая переводы на него */
+                accountId?: string;
+                /** @description Категория вместе с подкатегориями */
+                categoryId?: string;
+                /** @description Поиск по комментарию */
+                search?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransactionPageDto"];
+                };
+            };
+        };
+    };
+    TransactionsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTransactionDto"];
+            };
+        };
+        responses: {
+            /** @description Повтор с тем же id возвращает уже созданную операцию */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransactionDto"];
+                };
+            };
+            /** @description Неверные счёт, категория или суммы */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description id занят другим пользователем */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TransactionsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransactionDto"];
+                };
+            };
+        };
+    };
+    TransactionsController_replace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveTransactionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransactionDto"];
+                };
+            };
+            /** @description Неверные счёт, категория или суммы */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TransactionsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExchangeRatesController_list: {
+        parameters: {
+            query?: {
+                /** @description По умолчанию — последний известный курс */
+                date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExchangeRateDto"][];
+                };
+            };
+        };
+    };
+    ExchangeRatesController_convert: {
+        parameters: {
+            query: {
+                /** @description По умолчанию — последний известный курс */
+                date?: string;
+                /** @description Сумма в минимальных единицах валюты from */
+                amount: string;
+                from: "RUB" | "USD" | "EUR" | "CNY" | "GBP" | "JPY" | "KZT" | "BYN" | "TRY" | "AMD" | "GEL" | "AED";
+                to: "RUB" | "USD" | "EUR" | "CNY" | "GBP" | "JPY" | "KZT" | "BYN" | "TRY" | "AMD" | "GEL" | "AED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConvertResultDto"];
+                };
+            };
+        };
+    };
+    ReportsController_balance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BalanceReportDto"];
+                };
+            };
+        };
+    };
+    ReportsController_byCategory: {
+        parameters: {
+            query: {
+                /** @description С даты включительно */
+                from: string;
+                /** @description По дату включительно */
+                to: string;
+                kind: components["schemas"]["CategoryKind"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryReportDto"];
+                };
+            };
+        };
+    };
+    ReportsController_monthly: {
+        parameters: {
+            query: {
+                /** @description С даты включительно */
+                from: string;
+                /** @description По дату включительно */
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthlyReportDto"];
                 };
             };
         };

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import Header from "./Header";
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/finance",
+  usePathname: () => "/transactions",
 }));
 
 describe("Header", () => {
@@ -16,7 +16,7 @@ describe("Header", () => {
 
   it("помечает текущий раздел как активный", () => {
     render(<Header title="CA$H FLOW" />);
-    expect(screen.getByRole("link", { name: "Финансы" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Операции" })).toHaveAttribute(
       "aria-current",
       "page",
     );

@@ -12,7 +12,9 @@ interface HeaderProps {
 
 export const NAV_ITEMS = [
   { href: "/home", label: "Главная" },
-  { href: "/finance", label: "Финансы" },
+  { href: "/transactions", label: "Операции" },
+  { href: "/accounts", label: "Счета" },
+  { href: "/categories", label: "Категории" },
   { href: "/profile", label: "Профиль" },
 ];
 
