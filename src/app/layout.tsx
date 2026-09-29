@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.scss";
 import MainLayout from "@/components/layout/MainLayout";
 import { AuthProvider } from "@/shared/auth/AuthProvider";
 import ThemeRegistry from "@/theme/ThemeRegistry";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// Manrope с кириллицей: у Geist был подключён только латинский набор,
+// и русский текст отображался запасным шрифтом.
+const appFont = Manrope({
+  variable: "--font-app",
+  subsets: ["latin", "cyrillic"],
 });
 
 export const metadata: Metadata = {
@@ -27,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${appFont.variable} antialiased`}>
         <ThemeRegistry>
           <AuthProvider>
             <MainLayout>{children}</MainLayout>
