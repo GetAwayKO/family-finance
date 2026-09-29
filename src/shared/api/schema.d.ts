@@ -612,6 +612,102 @@ export interface paths {
         patch: operations["GoalsController_update"];
         trace?: never;
     };
+    "/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NotificationsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["NotificationsController_updateSettings"];
+        trace?: never;
+    };
+    "/notifications/vk/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_startLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/vk/link/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_completeLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/vk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["NotificationsController_unlink"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/vk/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_sendTest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1417,6 +1513,49 @@ export interface components {
             /** Format: date */
             targetDate?: string | null;
             archived?: boolean;
+        };
+        VkStatusDto: {
+            /** @description Сервер настроен для привязки ВКонтакте */
+            available: boolean;
+            linked: boolean;
+            /** @description Имя в ВК */
+            name: string | null;
+            /** @description Сообщество может писать пользователю. Если нет — открыть allowMessagesUrl и написать сообществу */
+            messagesAllowed: boolean;
+            allowMessagesUrl: string | null;
+        };
+        NotificationSettingsDto: {
+            /** @description Регулярные платежи */
+            recurring: boolean;
+            /** @description Расходы дошли до 80% и 100% лимита */
+            budget: boolean;
+            /** @description Операции других участников по общим счетам */
+            familyTransactions: boolean;
+            /** @description Приглашения в семью */
+            invites: boolean;
+            /** @description Достигнутые цели накоплений */
+            goals: boolean;
+        };
+        NotificationsDto: {
+            vk: components["schemas"]["VkStatusDto"];
+            settings: components["schemas"]["NotificationSettingsDto"];
+        };
+        UpdateNotificationSettingsDto: {
+            recurring?: boolean;
+            budget?: boolean;
+            familyTransactions?: boolean;
+            invites?: boolean;
+            goals?: boolean;
+        };
+        VkLinkUrlDto: {
+            /** @description Адрес VK ID, куда перейти для привязки */
+            url: string;
+        };
+        CompleteVkLinkDto: {
+            code: string;
+            state: string;
+            /** @description device_id из редиректа */
+            deviceId: string;
         };
     };
     responses: never;
@@ -2883,6 +3022,154 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["GoalDto"];
                 };
+            };
+        };
+    };
+    NotificationsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationsDto"];
+                };
+            };
+        };
+    };
+    NotificationsController_updateSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNotificationSettingsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationsDto"];
+                };
+            };
+        };
+    };
+    NotificationsController_startLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ссылка на VK ID; действует 10 минут */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VkLinkUrlDto"];
+                };
+            };
+            /** @description VK ID не настроен */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationsController_completeLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteVkLinkDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationsDto"];
+                };
+            };
+            /** @description Ссылка устарела или код неверный */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Аккаунт ВК привязан к другому пользователю */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationsController_unlink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationsController_sendTest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Сообщение отправлено */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description ВК не привязан или сообщения запрещены */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

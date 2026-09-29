@@ -1,7 +1,6 @@
 "use client";
 import {
   Alert,
-  Box,
   Button,
   Link as MuiLink,
   Paper,
@@ -13,6 +12,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { api } from "@/shared/api/client";
 import { useAuth, type User } from "@/shared/auth/AuthProvider";
+import VkNotifications from "./components/VkNotifications";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -52,7 +52,7 @@ function Profile({ user, onLogout }: { user: User; onLogout(): void }) {
   const changed = name.trim() !== "" && name.trim() !== user.name;
 
   return (
-    <Box sx={{ gridColumn: "1 / -1", p: 3 }}>
+    <Stack spacing={3} sx={{ gridColumn: "1 / -1", p: 3 }}>
       <Paper
         component="form"
         onSubmit={handleSubmit}
@@ -95,6 +95,7 @@ function Profile({ user, onLogout }: { user: User; onLogout(): void }) {
           </Stack>
         </Stack>
       </Paper>
-    </Box>
+      <VkNotifications />
+    </Stack>
   );
 }
