@@ -13,9 +13,12 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.3",
+    "@mui/x-data-grid": "^8.25.0",
+    "chart.js": "^4.5.1",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "recharts": "^3.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
