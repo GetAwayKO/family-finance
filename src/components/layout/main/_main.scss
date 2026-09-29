@@ -1,4 +1,6 @@
 main {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  // без min-height: 0 строка грида 1fr растягивается под контент и не скроллится
+  min-height: 0;
+  overflow-y: auto;
 }

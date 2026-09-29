@@ -1,3 +1,4 @@
+import "./_footer.scss";
 export default function Footer() {
-  return <footer></footer>;
+  return <footer>Подвал</footer>;
 }

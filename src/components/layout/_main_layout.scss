@@ -1,4 +1,10 @@
-.content {
+.layout {
+  height: 100%;
   display: grid;
-  grid-template-columns: 230px auto;
+  grid-template-columns: auto;
+  grid-template-rows: 100px 1fr 60px;
+  .content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
 }

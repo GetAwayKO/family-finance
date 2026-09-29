@@ -5,5 +5,5 @@ interface MainType {
 }
 
 export default function Main({ children }: MainType) {
-  return <main>{children}</main>;
+  return <main className="content">{children}</main>;
 }
