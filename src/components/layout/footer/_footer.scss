@@ -1,3 +1,26 @@
-footer {
-  background-color: rgb(205, 230, 185);
+.footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--mui-palette-divider);
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.85rem;
+  &__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 1.5rem;
+    row-gap: 0.25rem;
+  }
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: var(--mui-palette-text-primary);
+  }
+  &__copy {
+    margin-left: auto;
+  }
 }

@@ -1,42 +1,67 @@
-@font-face {
-  font-family: "PirataOne-Regular";
-  src: url("../../../../public/fonts/PirataOne-Regular.ttf");
-}
-header {
-  width: 100%;
-  background-color: rgb(205, 230, 185);
+.header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
-  color: #00000093;
-  font-weight: 600;
-  .title {
-    color: #05380793;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1rem;
+  background-color: var(--mui-palette-background-paper);
+  border-bottom: 1px solid var(--mui-palette-divider);
+  @media (min-width: 900px) {
+    padding: 0 1.5rem 0 1.25rem;
+  }
+  &__start {
     display: flex;
     align-items: center;
-    width: 50%;
-    h1 {
-      // border: "1px solid";
-      font-family: "PirataOne-Regular";
-      font-size: 40px;
-      -webkit-text-stroke: 0.5px #00000093;
+    gap: 0.25rem;
+  }
+  &__menu-button {
+    @media (min-width: 900px) {
+      display: none !important;
     }
   }
-  .menu {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    column-gap: 1.25rem;
-    padding-right: 1rem;
-    &__link {
-      padding: 0.25rem 0;
-      border-bottom: 2px solid transparent;
-      &:hover,
-      &--active {
-        color: #053807;
-        border-bottom-color: currentColor;
+  &__logo {
+    display: inline-flex;
+    border-radius: 12px;
+    // на узком экране в шапке остаётся только знак
+    @media (max-width: 479.95px) {
+      .logo__text {
+        display: none;
       }
     }
+    &:focus-visible {
+      outline: 2px solid var(--mui-palette-primary-main);
+      outline-offset: 4px;
+    }
+  }
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.25rem 0.25rem 0.25rem 0.75rem;
+    border-radius: 999px;
+    color: var(--mui-palette-text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.15s;
+    &:hover {
+      background-color: var(--mui-palette-action-hover);
+    }
+  }
+  &__user-name {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    @media (max-width: 599.95px) {
+      display: none;
+    }
+  }
+  &__avatar.MuiAvatar-root {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    background-color: var(--mui-palette-primary-light);
+    color: var(--mui-palette-primary-dark);
   }
 }

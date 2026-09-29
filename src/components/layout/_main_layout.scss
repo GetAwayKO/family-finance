@@ -1,10 +1,48 @@
 .layout {
   height: 100%;
   display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: 100px 1fr 60px;
-  .content {
-    display: grid;
-    grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 64px minmax(0, 1fr);
+  grid-template-areas:
+    "header"
+    "body";
+  > .header {
+    grid-area: header;
+  }
+  &--nav {
+    @media (min-width: 900px) {
+      grid-template-columns: 248px minmax(0, 1fr);
+      grid-template-areas:
+        "header header"
+        "sidebar body";
+    }
+  }
+  &__sidebar {
+    grid-area: sidebar;
+    display: none;
+    overflow-y: auto;
+    background-color: var(--mui-palette-background-paper);
+    border-right: 1px solid var(--mui-palette-divider);
+    @media (min-width: 900px) {
+      display: block;
+    }
+  }
+  &__drawer {
+    width: 272px;
+  }
+  &__drawer-logo {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
+    border-bottom: 1px solid var(--mui-palette-divider);
+  }
+  // Прокручивается содержимое вместе с футером; шапка и меню остаются на месте
+  &__body {
+    grid-area: body;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
 }

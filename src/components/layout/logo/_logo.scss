@@ -1,0 +1,20 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  &__text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--mui-palette-text-primary);
+  }
+  &__accent {
+    color: var(--mui-palette-primary-main);
+  }
+}
+
+.logo-mark {
+  flex-shrink: 0;
+  display: block;
+}

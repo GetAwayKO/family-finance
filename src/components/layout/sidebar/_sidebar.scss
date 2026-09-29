@@ -1,7 +1,41 @@
 .sidebar {
-  background-color: #afdd89;
-  width: 250px; /* Фиксированная ширина сайдбара */
-  position: fixed;
-  height: 100vh;
-  overflow-y: auto;
+  padding: 0.5rem 0.75rem 1.5rem;
+  &__group.MuiListSubheader-root {
+    background: transparent;
+    line-height: 2rem;
+    padding: 0.5rem 0.75rem 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mui-palette-text-secondary);
+  }
+  &__link.MuiListItemButton-root {
+    border-radius: 10px;
+    margin-bottom: 2px;
+    padding-block: 0.45rem;
+    color: var(--mui-palette-text-primary);
+    .MuiListItemText-primary {
+      font-size: 0.925rem;
+      font-weight: 500;
+    }
+    &:hover {
+      background-color: var(--mui-palette-action-hover);
+    }
+    &.Mui-selected,
+    &.Mui-selected:hover {
+      background-color: var(--mui-palette-primary-light);
+      color: var(--mui-palette-primary-dark);
+      .MuiListItemText-primary {
+        font-weight: 700;
+      }
+      .sidebar__icon {
+        color: var(--mui-palette-primary-main);
+      }
+    }
+  }
+  &__icon.MuiListItemIcon-root {
+    min-width: 34px;
+    color: var(--mui-palette-text-secondary);
+  }
 }
