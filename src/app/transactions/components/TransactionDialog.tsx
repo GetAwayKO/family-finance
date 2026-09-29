@@ -47,7 +47,9 @@ export default function TransactionDialog({
   // id создаём один раз на открытие формы: повторная отправка после сбоя
   // сети вернёт уже созданную операцию, а не создаст вторую.
   const [id] = useState(() => transaction?.id ?? crypto.randomUUID());
-  const active = accounts.filter((a) => !a.archived);
+  // Операции проводятся только по своим и общим счетам.
+  const usable = accounts.filter((a) => a.canTransact);
+  const active = usable.filter((a) => !a.archived);
   const accountOf = (accountId: string | null | undefined) =>
     accounts.find((a) => a.id === accountId);
 
@@ -60,7 +62,7 @@ export default function TransactionDialog({
   );
   const account = accountOf(accountId);
   const [amount, setAmount] = useState(
-    transaction && account
+    transaction?.amount && account
       ? toMoneyInput(transaction.amount, account.currency)
       : "",
   );
@@ -120,7 +122,7 @@ export default function TransactionDialog({
   }, [crossCurrency, toAmountTouched, amountMinor, account, toAccount, date]);
 
   const accountOptions = (selected: string) =>
-    accounts.filter((a) => !a.archived || a.id === selected);
+    usable.filter((a) => !a.archived || a.id === selected);
   const categoryOptions = isTransfer
     ? []
     : categoryTree(categories, type).filter(
@@ -188,7 +190,7 @@ export default function TransactionDialog({
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
             {error && <Alert severity="error">{error}</Alert>}
-            {accounts.length === 0 && (
+            {usable.length === 0 && (
               <Alert severity="info">
                 Сначала добавьте счёт в разделе «Счета».
               </Alert>

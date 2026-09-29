@@ -3,15 +3,17 @@ import AddIcon from "@mui/icons-material/Add";
 import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import Page from "@/components/layout/Page";
-import { useAccounts, useCategories } from "@/shared/finance/hooks";
+import { useAccounts, useCategories, useFamily } from "@/shared/finance/hooks";
 import TransactionDialog from "../transactions/components/TransactionDialog";
 import BalanceCard from "./components/BalanceCard";
 import ExpensesByCategory from "./components/ExpensesByCategory";
+import MembersCard from "./components/MembersCard";
 import MonthlyChart from "./components/MonthlyChart";
 
 export default function HomePage() {
   const accounts = useAccounts();
   const categories = useCategories();
+  const family = useFamily();
   const [adding, setAdding] = useState(false);
   // Меняется после новой операции, чтобы отчёты перезагрузились.
   const [version, setVersion] = useState(0);
@@ -44,6 +46,9 @@ export default function HomePage() {
         <ExpensesByCategory version={version} />
       </Box>
       <MonthlyChart version={version} />
+      {family.data && family.data.members.length > 1 && (
+        <MembersCard version={version} />
+      )}
       {adding && ready && (
         <TransactionDialog
           accounts={accounts.data!}

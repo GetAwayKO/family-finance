@@ -15,6 +15,7 @@ export const NAV_ITEMS = [
   { href: "/transactions", label: "Операции" },
   { href: "/accounts", label: "Счета" },
   { href: "/categories", label: "Категории" },
+  { href: "/family", label: "Семья" },
   { href: "/profile", label: "Профиль" },
 ];
 

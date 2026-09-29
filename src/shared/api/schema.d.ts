@@ -116,6 +116,166 @@ export interface paths {
         patch: operations["UsersController_updateMe"];
         trace?: never;
     };
+    "/family": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FamilyController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["FamilyController_update"];
+        trace?: never;
+    };
+    "/family/members/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["FamilyController_removeMember"];
+        options?: never;
+        head?: never;
+        patch: operations["FamilyController_updateMember"];
+        trace?: never;
+    };
+    "/family/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["FamilyController_leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/family/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FamilyController_listInvites"];
+        put?: never;
+        post: operations["FamilyController_createInvite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/family/invites/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["FamilyController_revokeInvite"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/incoming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["InvitesController_incoming"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["InvitesController_preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["InvitesController_acceptByToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["InvitesController_acceptById"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["InvitesController_decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/accounts": {
         parameters: {
             query?: never;
@@ -292,6 +452,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReportsController_byMember"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -329,11 +505,6 @@ export interface components {
             /** Format: email */
             email: string;
             name: string;
-            /**
-             * @description Валюта отчётов и общего баланса
-             * @example RUB
-             */
-            baseCurrency: string;
             /** Format: date-time */
             createdAt: string;
         };
@@ -367,14 +538,112 @@ export interface components {
         };
         UpdateProfileDto: {
             name?: string;
+        };
+        /**
+         * @description Роль текущего пользователя
+         * @enum {string}
+         */
+        FamilyRole: "owner" | "member";
+        FamilyMemberDto: {
+            /** Format: uuid */
+            userId: string;
+            name: string;
+            /** Format: email */
+            email: string;
+            role: components["schemas"]["FamilyRole"];
+            /** Format: date-time */
+            joinedAt: string;
+        };
+        FamilyDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Семья Ивановых */
+            name: string;
+            /**
+             * @description Валюта отчётов, общего баланса и бюджетов
+             * @example RUB
+             */
+            baseCurrency: string;
+            /** @description Роль текущего пользователя */
+            role: components["schemas"]["FamilyRole"];
+            members: components["schemas"]["FamilyMemberDto"][];
+        };
+        UpdateFamilyDto: {
+            name?: string;
             /**
              * @example RUB
              * @enum {string}
              */
             baseCurrency?: "RUB" | "USD" | "EUR" | "CNY" | "GBP" | "JPY" | "KZT" | "BYN" | "TRY" | "AMD" | "GEL" | "AED";
         };
+        UpdateMemberDto: {
+            role: components["schemas"]["FamilyRole"];
+        };
+        InviteDto: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: email
+             * @description Принять может только пользователь с этим email
+             */
+            email: string | null;
+            /** @description Кто пригласил */
+            invitedBy: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateInviteDto: {
+            /**
+             * Format: email
+             * @description Без email приглашение принимается по ссылке кем угодно
+             */
+            email?: string;
+        };
+        CreatedInviteDto: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: email
+             * @description Принять может только пользователь с этим email
+             */
+            email: string | null;
+            /** @description Кто пригласил */
+            invitedBy: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** @description Секрет для ссылки приглашения. Показывается один раз, в базе хранится только хеш */
+            token: string;
+        };
+        IncomingInviteDto: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: email
+             * @description Принять может только пользователь с этим email
+             */
+            email: string | null;
+            /** @description Кто пригласил */
+            invitedBy: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: date-time */
+            createdAt: string;
+            familyName: string;
+        };
+        InviteTokenDto: {
+            token: string;
+        };
         /** @enum {string} */
         AccountType: "cash" | "card" | "deposit";
+        /**
+         * @description Что семья видит по личному счёту: full — остаток и операции, summary — остаток и итоги
+         * @enum {string}
+         */
+        AccountVisibility: "full" | "summary";
         AccountDto: {
             /** Format: uuid */
             id: string;
@@ -383,6 +652,17 @@ export interface components {
             type: components["schemas"]["AccountType"];
             /** @example RUB */
             currency: string;
+            /**
+             * Format: uuid
+             * @description Владелец личного счёта; null — общий счёт семьи
+             */
+            ownerId: string | null;
+            /** @description Что семья видит по личному счёту: full — остаток и операции, summary — остаток и итоги */
+            visibility: components["schemas"]["AccountVisibility"];
+            /** @description Текущий пользователь может проводить операции */
+            canTransact: boolean;
+            /** @description Текущий пользователь может менять счёт */
+            canManage: boolean;
             /**
              * @description Остаток на момент заведения счёта
              * @example 150000
@@ -415,6 +695,10 @@ export interface components {
              * @example 150000
              */
             initialBalance?: string;
+            /** @description Общий счёт семьи (создаёт владелец семьи). По умолчанию личный */
+            shared?: boolean;
+            /** @description Только для личного счёта, по умолчанию full */
+            visibility?: components["schemas"]["AccountVisibility"];
         };
         UpdateAccountDto: {
             name?: string;
@@ -423,6 +707,8 @@ export interface components {
             initialBalance?: string;
             /** @description Архивный счёт скрыт из форм */
             archived?: boolean;
+            /** @description Только для личного счёта */
+            visibility?: components["schemas"]["AccountVisibility"];
         };
         /** @enum {string} */
         CategoryKind: "income" | "expense";
@@ -476,10 +762,10 @@ export interface components {
              */
             accountId: string;
             /**
-             * @description Сумма в валюте счёта accountId, > 0
+             * @description Сумма в валюте счёта accountId, > 0. null — перевод со счёта, детализацию которого владелец скрыл
              * @example 150000
              */
-            amount: string;
+            amount: string | null;
             /** Format: uuid */
             categoryId: string | null;
             /**
@@ -488,11 +774,19 @@ export interface components {
              */
             toAccountId: string | null;
             /**
-             * @description Перевод: сумма зачисления в валюте счёта toAccountId
+             * @description Перевод: сумма зачисления в валюте счёта toAccountId. null — не перевод или счёт скрыт
              * @example 150000
              */
             toAmount: string | null;
             comment: string;
+            /**
+             * Format: uuid
+             * @description Автор операции
+             */
+            authorId: string;
+            authorName: string;
+            /** @description Текущий пользователь может изменить или удалить операцию */
+            canEdit: boolean;
             /** Format: date-time */
             createdAt: string;
         };
@@ -602,7 +896,7 @@ export interface components {
         };
         BalanceReportDto: {
             /**
-             * @description Основная валюта пользователя
+             * @description Основная валюта семьи
              * @example RUB
              */
             currency: string;
@@ -618,16 +912,16 @@ export interface components {
         CategoryAmountDto: {
             /**
              * Format: uuid
-             * @description Категория верхнего уровня; подкатегории включены в неё
+             * @description Категория верхнего уровня; подкатегории включены в неё. null — «Личные (скрыто)»: операции по скрытым счетам других участников одной строкой
              */
-            categoryId: string;
+            categoryId: string | null;
             name: string;
             /** @example 150000 */
             amount: string;
         };
         CategoryReportDto: {
             /**
-             * @description Основная валюта пользователя
+             * @description Основная валюта семьи
              * @example RUB
              */
             currency: string;
@@ -648,7 +942,7 @@ export interface components {
         };
         MonthlyReportDto: {
             /**
-             * @description Основная валюта пользователя
+             * @description Основная валюта семьи
              * @example RUB
              */
             currency: string;
@@ -656,6 +950,26 @@ export interface components {
             missingRates: string[];
             /** @description Все месяцы периода по порядку, включая пустые */
             months: components["schemas"]["MonthAmountDto"][];
+        };
+        MemberAmountDto: {
+            /** Format: uuid */
+            userId: string;
+            name: string;
+            /** @example 150000 */
+            income: string;
+            /** @example 150000 */
+            expense: string;
+        };
+        MemberReportDto: {
+            /**
+             * @description Основная валюта семьи
+             * @example RUB
+             */
+            currency: string;
+            /** @description Валюты, для которых нет ни одного курса: их суммы в отчёт не вошли */
+            missingRates: string[];
+            /** @description Доходы и расходы по авторам операций, по убыванию расходов */
+            items: components["schemas"]["MemberAmountDto"][];
         };
     };
     responses: never;
@@ -854,6 +1168,390 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["UserDto"];
                 };
+            };
+        };
+    };
+    FamilyController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Семья пользователя */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamilyDto"];
+                };
+            };
+        };
+    };
+    FamilyController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFamilyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamilyDto"];
+                };
+            };
+            /** @description Только владелец семьи */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FamilyController_removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Участник уходит в свою семью вместе с личными счетами */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Только владелец семьи */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FamilyController_updateMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMemberDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamilyDto"];
+                };
+            };
+            /** @description Только владелец семьи */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description В семье не останется владельца */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FamilyController_leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Новая семья пользователя: личные счета и копия категорий */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamilyDto"];
+                };
+            };
+            /** @description Пользователь один в семье или последний владелец */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FamilyController_listInvites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Действующие приглашения */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteDto"][];
+                };
+            };
+            /** @description Только владелец семьи */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FamilyController_createInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateInviteDto"];
+            };
+        };
+        responses: {
+            /** @description Приглашение действует 7 дней и принимается один раз */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedInviteDto"];
+                };
+            };
+            /** @description Только владелец семьи */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Пользователь с этим email уже в семье */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FamilyController_revokeInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InvitesController_incoming: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Приглашения на email пользователя */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncomingInviteDto"][];
+                };
+            };
+        };
+    };
+    InvitesController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteTokenDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncomingInviteDto"];
+                };
+            };
+            /** @description Приглашение на другой email */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Истекло, отозвано или уже принято */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InvitesController_acceptByToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteTokenDto"];
+            };
+        };
+        responses: {
+            /** @description Принять по ссылке */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamilyDto"];
+                };
+            };
+            /** @description Приглашение на другой email */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Истекло, отозвано или уже принято */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Уже в этой семье или в текущей семье есть другие участники */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InvitesController_acceptById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Принять входящее */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamilyDto"];
+                };
+            };
+            /** @description Истекло, отозвано или уже принято */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Уже в этой семье или в текущей семье есть другие участники */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InvitesController_decline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1092,6 +1790,8 @@ export interface operations {
                 accountId?: string;
                 /** @description Категория вместе с подкатегориями */
                 categoryId?: string;
+                /** @description Автор операции */
+                authorId?: string;
                 /** @description Поиск по комментарию */
                 search?: string;
                 limit?: number;
@@ -1297,6 +1997,8 @@ export interface operations {
                 from: string;
                 /** @description По дату включительно */
                 to: string;
+                /** @description Только операции этого участника */
+                authorId?: string;
                 kind: components["schemas"]["CategoryKind"];
             };
             header?: never;
@@ -1322,6 +2024,8 @@ export interface operations {
                 from: string;
                 /** @description По дату включительно */
                 to: string;
+                /** @description Только операции этого участника */
+                authorId?: string;
             };
             header?: never;
             path?: never;
@@ -1335,6 +2039,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MonthlyReportDto"];
+                };
+            };
+        };
+    };
+    ReportsController_byMember: {
+        parameters: {
+            query: {
+                /** @description С даты включительно */
+                from: string;
+                /** @description По дату включительно */
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberReportDto"];
                 };
             };
         };

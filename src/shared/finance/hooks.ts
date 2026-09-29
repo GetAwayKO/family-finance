@@ -7,3 +7,5 @@ export const useAccounts = () => useApi(() => api.GET("/accounts"), []);
 export const useCategories = () => useApi(() => api.GET("/categories"), []);
 
 export const useCurrencies = () => useApi(() => api.GET("/currencies"), []);
+
+export const useFamily = () => useApi(() => api.GET("/family"), []);

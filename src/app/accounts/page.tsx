@@ -21,18 +21,36 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import { useMemo, useState } from "react";
 import Page from "@/components/layout/Page";
 import { api } from "@/shared/api/client";
 import { ApiError, call } from "@/shared/api/request";
-import { useAccounts, useCurrencies } from "@/shared/finance/hooks";
+import { useAuth } from "@/shared/auth/AuthProvider";
+import { useAccounts, useCurrencies, useFamily } from "@/shared/finance/hooks";
 import { formatMoney } from "@/shared/finance/money";
-import { ACCOUNT_TYPE_LABELS, type Account } from "@/shared/finance/types";
+import {
+  ACCOUNT_TYPE_LABELS,
+  VISIBILITY_LABELS,
+  type Account,
+} from "@/shared/finance/types";
 import AccountDialog from "./components/AccountDialog";
 
 export default function AccountsPage() {
+  const { user } = useAuth();
   const accounts = useAccounts();
   const currencies = useCurrencies();
+  const family = useFamily();
+  const memberNames = useMemo(
+    () => new Map((family.data?.members ?? []).map((m) => [m.userId, m.name])),
+    [family.data],
+  );
+  const ownerLabel = (account: Account) =>
+    account.ownerId === null
+      ? "Общий"
+      : account.ownerId === user?.id
+        ? "Мой"
+        : (memberNames.get(account.ownerId) ?? "—");
   const [editing, setEditing] = useState<Account | "new" | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -75,7 +93,7 @@ export default function AccountsPage() {
   return (
     <Page
       title="Счета"
-      error={accounts.error ?? currencies.error ?? actionError}
+      error={accounts.error ?? currencies.error ?? family.error ?? actionError}
       actions={
         <>
           <FormControlLabel
@@ -111,6 +129,7 @@ export default function AccountsPage() {
             <TableHead>
               <TableRow>
                 <TableCell>Название</TableCell>
+                <TableCell>Владелец</TableCell>
                 <TableCell>Тип</TableCell>
                 <TableCell>Валюта</TableCell>
                 <TableCell align="right">Остаток</TableCell>
@@ -122,8 +141,19 @@ export default function AccountsPage() {
                 <TableRow key={account.id} hover>
                   <TableCell>
                     {account.name}{" "}
+                    {account.visibility === "summary" && (
+                      <Tooltip title={VISIBILITY_LABELS.summary}>
+                        <VisibilityOffOutlinedIcon
+                          fontSize="small"
+                          color="action"
+                          aria-label="Операции скрыты от семьи"
+                          sx={{ verticalAlign: "middle" }}
+                        />
+                      </Tooltip>
+                    )}{" "}
                     {account.archived && <Chip size="small" label="в архиве" />}
                   </TableCell>
+                  <TableCell>{ownerLabel(account)}</TableCell>
                   <TableCell>{ACCOUNT_TYPE_LABELS[account.type]}</TableCell>
                   <TableCell>{account.currency}</TableCell>
                   <TableCell align="right">
@@ -138,29 +168,37 @@ export default function AccountsPage() {
                     </Typography>
                   </TableCell>
                   <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
-                    <Tooltip title="Изменить">
-                      <IconButton onClick={() => setEditing(account)}>
-                        <EditOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip
-                      title={account.archived ? "Вернуть из архива" : "В архив"}
-                    >
-                      <IconButton
-                        onClick={() => setArchived(account, !account.archived)}
-                      >
-                        {account.archived ? (
-                          <UnarchiveOutlinedIcon />
-                        ) : (
-                          <ArchiveOutlinedIcon />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Удалить">
-                      <IconButton onClick={() => remove(account)}>
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Tooltip>
+                    {account.canManage && (
+                      <>
+                        <Tooltip title="Изменить">
+                          <IconButton onClick={() => setEditing(account)}>
+                            <EditOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                          title={
+                            account.archived ? "Вернуть из архива" : "В архив"
+                          }
+                        >
+                          <IconButton
+                            onClick={() =>
+                              setArchived(account, !account.archived)
+                            }
+                          >
+                            {account.archived ? (
+                              <UnarchiveOutlinedIcon />
+                            ) : (
+                              <ArchiveOutlinedIcon />
+                            )}
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Удалить">
+                          <IconButton onClick={() => remove(account)}>
+                            <DeleteOutlineIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -172,6 +210,7 @@ export default function AccountsPage() {
         <AccountDialog
           account={editing === "new" ? undefined : editing}
           currencies={currencies.data}
+          canShare={family.data?.role === "owner"}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);

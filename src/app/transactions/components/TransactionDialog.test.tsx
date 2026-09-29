@@ -12,11 +12,20 @@ vi.mock("@/shared/api/client", () => ({
   },
 }));
 
-const account = (id: string, currency = "RUB"): Account => ({
+const account = (
+  id: string,
+  currency = "RUB",
+  extra: Partial<Account> = {},
+): Account => ({
   id,
   name: id,
   type: "card",
   currency,
+  ownerId: "me",
+  visibility: "full",
+  canTransact: true,
+  canManage: true,
+  ...extra,
   initialBalance: "0",
   balance: "0",
   archived: false,
@@ -84,6 +93,30 @@ describe("TransactionDialog", () => {
       amount: "125050",
     });
     expect(second.id).toBe(first.id);
+  });
+
+  it("не предлагает чужие личные счета", async () => {
+    render(
+      <TransactionDialog
+        accounts={[
+          account("Моя карта"),
+          account("Карта Бориса", "RUB", {
+            ownerId: "boris",
+            canTransact: false,
+            canManage: false,
+          }),
+          account("Общая", "RUB", { ownerId: null, canManage: false }),
+        ]}
+        categories={categories}
+        onClose={vi.fn()}
+        onSaved={vi.fn()}
+      />,
+    );
+    await userEvent.click(screen.getByRole("combobox", { name: /Счёт/ }));
+    const listbox = await screen.findByRole("listbox");
+    expect(within(listbox).getByText(/Моя карта/)).toBeInTheDocument();
+    expect(within(listbox).getByText(/Общая/)).toBeInTheDocument();
+    expect(within(listbox).queryByText(/Карта Бориса/)).not.toBeInTheDocument();
   });
 
   it("для перевода между валютами требует сумму зачисления", async () => {

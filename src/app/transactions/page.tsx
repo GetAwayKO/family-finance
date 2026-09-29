@@ -11,12 +11,14 @@ import { useMemo, useState } from "react";
 import Page from "@/components/layout/Page";
 import { api } from "@/shared/api/client";
 import { useApi } from "@/shared/api/request";
+import { useAuth } from "@/shared/auth/AuthProvider";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { categoryLabel } from "@/shared/finance/categories";
 import { formatDate, monthRange } from "@/shared/finance/dates";
-import { useAccounts, useCategories } from "@/shared/finance/hooks";
+import { useAccounts, useCategories, useFamily } from "@/shared/finance/hooks";
 import { formatMoney } from "@/shared/finance/money";
 import {
+  canSeeDetails,
   TRANSACTION_TYPE_LABELS,
   type Transaction,
 } from "@/shared/finance/types";
@@ -28,13 +30,16 @@ import TransactionFilters, {
 const localeText = ruRU.components.MuiDataGrid.defaultProps.localeText;
 
 export default function TransactionsPage() {
+  const { user } = useAuth();
   const accounts = useAccounts();
   const categories = useCategories();
+  const family = useFamily();
   const [filters, setFilters] = useState<Filters>(() => ({
     ...monthRange(),
     type: "",
     accountId: "",
     categoryId: "",
+    authorId: "",
     search: "",
   }));
   const [pagination, setPagination] = useState<GridPaginationModel>({
@@ -57,6 +62,7 @@ export default function TransactionsPage() {
     type: filters.type || undefined,
     accountId: filters.accountId || undefined,
     categoryId: filters.categoryId || undefined,
+    authorId: filters.authorId || undefined,
     search: search || undefined,
     limit: pagination.pageSize,
     offset: pagination.page * pagination.pageSize,
@@ -116,6 +122,15 @@ export default function TransactionsPage() {
       ),
     },
     { field: "comment", headerName: "Комментарий", flex: 1.5, minWidth: 160 },
+    ...((family.data?.members.length ?? 0) > 1
+      ? [
+          {
+            field: "authorName",
+            headerName: "Автор",
+            width: 130,
+          } satisfies GridColDef<Transaction>,
+        ]
+      : []),
   ];
 
   const ready = accounts.data && categories.data;
@@ -123,7 +138,9 @@ export default function TransactionsPage() {
   return (
     <Page
       title="Операции"
-      error={transactions.error ?? accounts.error ?? categories.error}
+      error={
+        transactions.error ?? accounts.error ?? categories.error ?? family.error
+      }
       actions={
         <Button
           variant="contained"
@@ -144,8 +161,11 @@ export default function TransactionsPage() {
             setPagination((p) => ({ ...p, page: 0 }));
           }
         }}
-        accounts={accounts.data ?? []}
+        accounts={(accounts.data ?? []).filter(
+          (a) => user && canSeeDetails(a, user.id),
+        )}
         categories={categories.data ?? []}
+        members={family.data?.members ?? []}
       />
       <Paper sx={{ height: 600, minWidth: 0 }}>
         <DataGrid
@@ -160,9 +180,10 @@ export default function TransactionsPage() {
           disableColumnFilter
           disableColumnSorting
           disableRowSelectionOnClick
-          onRowClick={({ row }) => ready && setEditing(row)}
+          onRowClick={({ row }) => ready && row.canEdit && setEditing(row)}
+          getRowClassName={({ row }) => (row.canEdit ? "editable" : "")}
           localeText={localeText}
-          sx={{ border: 0, "& .MuiDataGrid-row": { cursor: "pointer" } }}
+          sx={{ border: 0, "& .editable": { cursor: "pointer" } }}
         />
       </Paper>
       {editing && ready && (
@@ -199,6 +220,14 @@ function Amount({
         ? "error.main"
         : "text.secondary";
   const toCurrency = accountById.get(t.toAccountId ?? "")?.currency;
+  // Сумма на стороне скрытого счёта не приходит: показываем зачисление.
+  if (t.amount === null) {
+    return (
+      <Typography component="span" variant="body2" color="text.secondary">
+        {t.toAmount && toCurrency ? formatMoney(t.toAmount, toCurrency) : "—"}
+      </Typography>
+    );
+  }
   return (
     <Typography
       component="span"

@@ -16,8 +16,10 @@ import { ApiError, call } from "@/shared/api/request";
 import { parseMoney, toMoneyInput } from "@/shared/finance/money";
 import {
   ACCOUNT_TYPE_LABELS,
+  VISIBILITY_LABELS,
   type Account,
   type AccountType,
+  type AccountVisibility,
   type Currency,
   type CurrencyCode,
 } from "@/shared/finance/types";
@@ -26,6 +28,8 @@ interface AccountDialogProps {
   /** Счёт для редактирования; без него — создание. */
   account?: Account;
   currencies: Currency[];
+  /** Можно завести общий счёт семьи (роль «владелец»). */
+  canShare: boolean;
   onClose(): void;
   onSaved(): void;
 }
@@ -33,6 +37,7 @@ interface AccountDialogProps {
 export default function AccountDialog({
   account,
   currencies,
+  canShare,
   onClose,
   onSaved,
 }: AccountDialogProps) {
@@ -41,6 +46,10 @@ export default function AccountDialog({
   const [name, setName] = useState(account?.name ?? "");
   const [type, setType] = useState<AccountType>(account?.type ?? "card");
   const [currency, setCurrency] = useState(account?.currency ?? "RUB");
+  const [shared, setShared] = useState(account?.ownerId === null);
+  const [visibility, setVisibility] = useState<AccountVisibility>(
+    account?.visibility ?? "full",
+  );
   const [initialBalance, setInitialBalance] = useState(
     account ? toMoneyInput(account.initialBalance, account.currency) : "",
   );
@@ -58,12 +67,23 @@ export default function AccountDialog({
     setSaving(true);
     setError(null);
     try {
-      const body = { name: name.trim(), type, initialBalance: initialMinor };
+      const body = {
+        name: name.trim(),
+        type,
+        initialBalance: initialMinor,
+        // Общий счёт всегда виден семье, видимость есть только у личного.
+        ...(shared ? {} : { visibility }),
+      };
       await call(() =>
         account
           ? api.PATCH("/accounts/{id}", { params: { path: { id } }, body })
           : api.POST("/accounts", {
-              body: { ...body, id, currency: currency as CurrencyCode },
+              body: {
+                ...body,
+                id,
+                currency: currency as CurrencyCode,
+                shared,
+              },
             }),
       );
       onSaved();
@@ -89,6 +109,38 @@ export default function AccountDialog({
               autoFocus
               slotProps={{ htmlInput: { maxLength: 100 } }}
             />
+            {!account && canShare && (
+              <TextField
+                select
+                label="Чей счёт"
+                value={shared ? "shared" : "personal"}
+                onChange={(e) => setShared(e.target.value === "shared")}
+                helperText={
+                  shared
+                    ? "Операции по нему проводят все участники семьи"
+                    : "Операции по нему проводите только вы"
+                }
+              >
+                <MenuItem value="personal">Личный</MenuItem>
+                <MenuItem value="shared">Общий семейный</MenuItem>
+              </TextField>
+            )}
+            {!shared && (
+              <TextField
+                select
+                label="Что видит семья"
+                value={visibility}
+                onChange={(e) =>
+                  setVisibility(e.target.value as AccountVisibility)
+                }
+              >
+                {Object.entries(VISIBILITY_LABELS).map(([value, label]) => (
+                  <MenuItem key={value} value={value}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
             <TextField
               select
               label="Тип"

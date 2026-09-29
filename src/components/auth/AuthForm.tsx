@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { AuthError } from "@/shared/auth/AuthProvider";
 
 export interface AuthFormValues {
@@ -50,6 +50,15 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
   });
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Куда вернуться после входа (например, на приглашение) — сохраняем
+  // и при переходе между входом и регистрацией.
+  const [switchHref, setSwitchHref] = useState(text.switchHref);
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (next) {
+      setSwitchHref(`${text.switchHref}?next=${encodeURIComponent(next)}`);
+    }
+  }, [text.switchHref]);
 
   const change =
     (field: keyof AuthFormValues) =>
@@ -124,7 +133,7 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
           </Button>
           <Typography variant="body2">
             {text.switchText}{" "}
-            <MuiLink component={Link} href={text.switchHref}>
+            <MuiLink component={Link} href={switchHref}>
               {text.switchLink}
             </MuiLink>
           </Typography>

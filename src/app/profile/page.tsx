@@ -3,17 +3,16 @@ import {
   Alert,
   Box,
   Button,
-  MenuItem,
+  Link as MuiLink,
   Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { api } from "@/shared/api/client";
 import { useAuth, type User } from "@/shared/auth/AuthProvider";
-import { useCurrencies } from "@/shared/finance/hooks";
-import type { CurrencyCode } from "@/shared/finance/types";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -24,9 +23,7 @@ export default function ProfilePage() {
 
 function Profile({ user, onLogout }: { user: User; onLogout(): void }) {
   const { setUser } = useAuth();
-  const currencies = useCurrencies();
   const [name, setName] = useState(user.name);
-  const [baseCurrency, setBaseCurrency] = useState(user.baseCurrency);
   const [message, setMessage] = useState<{
     severity: "success" | "error";
     text: string;
@@ -39,10 +36,7 @@ function Profile({ user, onLogout }: { user: User; onLogout(): void }) {
     setMessage(null);
     try {
       const { data } = await api.PATCH("/users/me", {
-        body: {
-          name: name.trim(),
-          baseCurrency: baseCurrency as CurrencyCode,
-        },
+        body: { name: name.trim() },
       });
       if (!data) throw new Error();
       setUser(data);
@@ -55,9 +49,7 @@ function Profile({ user, onLogout }: { user: User; onLogout(): void }) {
     }
   }
 
-  const changed =
-    name.trim() !== "" &&
-    (name.trim() !== user.name || baseCurrency !== user.baseCurrency);
+  const changed = name.trim() !== "" && name.trim() !== user.name;
 
   return (
     <Box sx={{ gridColumn: "1 / -1", p: 3 }}>
@@ -79,23 +71,13 @@ function Profile({ user, onLogout }: { user: User; onLogout(): void }) {
             slotProps={{ htmlInput: { maxLength: 100 } }}
           />
           <TextField label="Email" value={user.email} disabled />
-          <TextField
-            select
-            label="Основная валюта"
-            value={baseCurrency}
-            onChange={(event) => setBaseCurrency(event.target.value)}
-            helperText="В ней считаются общий баланс и отчёты"
-            disabled={!currencies.data}
-          >
-            {(currencies.data ?? [{ code: user.baseCurrency, name: "" }]).map(
-              (c) => (
-                <MenuItem key={c.code} value={c.code}>
-                  {c.code}
-                  {c.name && ` — ${c.name}`}
-                </MenuItem>
-              ),
-            )}
-          </TextField>
+          <Typography variant="body2" color="text.secondary">
+            Основная валюта и участники — на странице{" "}
+            <MuiLink component={Link} href="/family">
+              «Семья»
+            </MuiLink>
+            .
+          </Typography>
           <Typography variant="body2" color="text.secondary">
             С нами с {new Date(user.createdAt).toLocaleDateString("ru-RU")}
           </Typography>

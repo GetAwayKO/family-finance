@@ -5,6 +5,7 @@ import {
   TRANSACTION_TYPE_LABELS,
   type Account,
   type Category,
+  type FamilyMember,
   type TransactionType,
 } from "@/shared/finance/types";
 
@@ -14,14 +15,17 @@ export interface Filters {
   type: TransactionType | "";
   accountId: string;
   categoryId: string;
+  authorId: string;
   search: string;
 }
 
 interface TransactionFiltersProps {
   value: Filters;
   onChange(next: Filters): void;
+  /** Счета, операции по которым видны пользователю. */
   accounts: Account[];
   categories: Category[];
+  members: FamilyMember[];
 }
 
 export default function TransactionFilters({
@@ -29,6 +33,7 @@ export default function TransactionFilters({
   onChange,
   accounts,
   categories,
+  members,
 }: TransactionFiltersProps) {
   const set = <K extends keyof Filters>(key: K, next: Filters[K]) =>
     onChange({ ...value, [key]: next });
@@ -121,6 +126,22 @@ export default function TransactionFilters({
           </MenuItem>
         ))}
       </TextField>
+      {members.length > 1 && (
+        <TextField
+          select
+          label="Автор"
+          size="small"
+          value={value.authorId}
+          onChange={(e) => set("authorId", e.target.value)}
+        >
+          <MenuItem value="">Все</MenuItem>
+          {members.map((m) => (
+            <MenuItem key={m.userId} value={m.userId}>
+              {m.name}
+            </MenuItem>
+          ))}
+        </TextField>
+      )}
       <TextField
         label="Поиск по комментарию"
         size="small"
