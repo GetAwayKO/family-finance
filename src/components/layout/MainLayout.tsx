@@ -9,7 +9,6 @@ interface LayoutType {
 }
 
 export default function MainLayout({ children }: LayoutType) {
-  // const [showSidebar, setShowSidebar] = useState(false);
   return (
     <div className="layout">
       <Header title={"CA$H FLOW"} />

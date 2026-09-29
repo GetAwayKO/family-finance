@@ -1,23 +1,43 @@
 "use client";
 
-import { Menu } from "@mui/icons-material";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import "./_header.scss";
-import React from "react";
-interface Header {
+
+interface HeaderProps {
   title: string;
 }
 
-export default function Header({ title }: Header) {
+export const NAV_ITEMS = [
+  { href: "/home", label: "Главная" },
+  { href: "/finance", label: "Финансы" },
+  { href: "/profile", label: "Профиль" },
+];
+
+export default function Header({ title }: HeaderProps) {
+  const pathname = usePathname();
   return (
     <header>
       <div className="title">
         <h1>{title}</h1>
       </div>
-      <div className="menu">
-        <span>Кнопка</span>
-        <span>Кнопка</span>
-        <span>Кнопка</span>
-      </div>
+      <nav className="menu">
+        {NAV_ITEMS.map(({ href, label }) => {
+          const active = pathname === href || pathname.startsWith(href + "/");
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={
+                active ? "menu__link menu__link--active" : "menu__link"
+              }
+              aria-current={active ? "page" : undefined}
+            >
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
     </header>
   );
 }

@@ -11,9 +11,6 @@ header {
   padding: 0.5rem;
   color: #00000093;
   font-weight: 600;
-  .menu-btn {
-    width: 50px;
-  }
   .title {
     color: #05380793;
     display: flex;
@@ -27,8 +24,17 @@ header {
     }
   }
   .menu {
-    width: 200px;
     display: flex;
-    justify-content: space-between;
+    gap: 1.5rem;
+    padding-right: 1rem;
+    &__link {
+      padding: 0.25rem 0;
+      border-bottom: 2px solid transparent;
+      &:hover,
+      &--active {
+        color: #053807;
+        border-bottom-color: currentColor;
+      }
+    }
   }
 }
