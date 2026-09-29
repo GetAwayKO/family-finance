@@ -24,4 +24,9 @@ describe("Header", () => {
       "aria-current",
     );
   });
+
+  it("скрывает разделы, если пользователь не вошёл", () => {
+    render(<Header title="CA$H FLOW" showNav={false} />);
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+  });
 });
